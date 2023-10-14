@@ -19,4 +19,9 @@ export class EmailAddress {
   get email(): string {
     return this._email;
   }
+
+  getValue(): string {
+    return this._email;
+  }
 }
+
