@@ -1,19 +1,18 @@
 import { UserRepository } from "src/use-cases/ports/user-repository";
 import { UseCase } from "src/use-cases/ports/use-case";
 import { Either, left, right } from "src/shared/either";
-import { Inject } from "@nestjs/common";
 import { IMapper } from "src/use-cases/ports/imapper";
 import { ExistingUserError } from "src/entities/RegisterError";
 import { User } from "src/entities/User";
-import { UserRequestDTO, UserResponse } from "../dto/user-dto";
+import { UserRequestDTO } from "../dto/user-dto";
 import { UserDTO } from "src/interface/dto/user-converter";
 
 export const PERSON_MAPPER_TOKEN = 'PERSON_MAPPER_TOKEN';
 
 export class RegisterUserUseCase implements UseCase<UserRequestDTO, Either<Error, UserDTO>> {
 	constructor(
-		@Inject('UserRepositoryToken') private userRepository: UserRepository,
-		@Inject(PERSON_MAPPER_TOKEN) private mapper: IMapper<UserRequestDTO, User>
+		private userRepository: UserRepository,
+		private mapper: IMapper<UserRequestDTO, User>
 	) { }
 
 	async execute(userDTO: UserRequestDTO): Promise<Either<Error, UserDTO>> {

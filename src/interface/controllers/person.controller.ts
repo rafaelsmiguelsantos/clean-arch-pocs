@@ -14,12 +14,12 @@ export class UserController {
 	@Post('register')
 	@HttpCode(200)
 	async register(@Body() user: UserRequestDTO): Promise<UserDTO> {
+
 		const result = await this.registerUser.execute(user);
-	
 		if (result.isLeft()) {
 			ErrorHandler.handle(result.value);
 		}
-	
+
 		return result.value;
 	}
 }

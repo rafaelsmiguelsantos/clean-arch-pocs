@@ -8,19 +8,22 @@ import { UserMongoRepository } from "src/devices/user-mongodb-repository";
   controllers: [UserController],
   providers: [
     UserMapper,
-    RegisterUserUseCase,
     {
       provide: 'UserRepositoryToken',
       useClass: UserMongoRepository, // Sua implementação concreta
     },
     {
-      provide: 'REGISTER_USER_USECASE',
-      useClass: RegisterUserUseCase,
-    },
-    {
       provide: PERSON_MAPPER_TOKEN,
       useClass: UserMapper
+    },
+    {
+      provide: 'REGISTER_USER_USECASE',
+      useFactory: (userRepository: UserMongoRepository, mapper: UserMapper) => {
+        return new RegisterUserUseCase(userRepository, mapper);
+      },
+      inject: ['UserRepositoryToken', PERSON_MAPPER_TOKEN],
     },
   ]
 })
 export class UserModule { }
+
