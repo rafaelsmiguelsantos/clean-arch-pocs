@@ -1,3 +1,5 @@
+import { ValidationError } from "./RegisterError";
+
 export class FullName {
     private _firstName: string;
     private _lastName: string;
@@ -11,10 +13,10 @@ export class FullName {
 
     private validateName(name: string, fieldName: string): void {
         if (!name) {
-            throw new Error(`${fieldName} cannot be empty.`);
+            throw new ValidationError(`${fieldName} cannot be empty.`);
         }
         if (name.length > 50) {
-            throw new Error(`${fieldName} is too long.`);
+            throw new ValidationError(`${fieldName} is too long.`);
         }
     }
 
@@ -45,5 +47,9 @@ export class FullName {
 
     get middleName(): string | undefined {
         return this._middleName;
+    }
+
+    getValue(): string {
+        return `${this._firstName} ${this._middleName ? this._middleName + ' ' : ''}${this._lastName}`;
     }
 }

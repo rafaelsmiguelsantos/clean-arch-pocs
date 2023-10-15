@@ -1,20 +1,20 @@
-import { Body, Controller, Post, HttpCode, Inject, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, Inject } from '@nestjs/common';
 import { UseCase } from 'src/use-cases/ports/use-case';
-import { PersonRequestDTO, PersonResponse } from '../dto/personDto';
 import { Either } from 'src/shared/either'; 
-import { ExistingUserError, InvalidPhoneFormatException, ValidationError } from 'src/entities/RegisterError';
 import { ErrorHandler } from 'src/shared/error-handler';
+import { UserRequestDTO } from 'src/use-cases/dto/user-dto';
+import { UserDTO } from '../dto/user-converter';
 
-@Controller('person')
-export class PersonController {
+@Controller('user')
+export class UserController {
 	constructor(
-		@Inject('REGISTER_USER_USECASE') private readonly registerUser: UseCase<PersonRequestDTO, Either<Error, PersonResponse>>
+		@Inject('REGISTER_USER_USECASE') private readonly registerUser: UseCase<UserRequestDTO, Either<Error, UserDTO>>
 	) {}
 
 	@Post('register')
 	@HttpCode(200)
-	async register(@Body() person: PersonRequestDTO): Promise<PersonResponse> {
-		const result = await this.registerUser.execute(person);
+	async register(@Body() user: UserRequestDTO): Promise<UserDTO> {
+		const result = await this.registerUser.execute(user);
 	
 		if (result.isLeft()) {
 			ErrorHandler.handle(result.value);
@@ -23,3 +23,4 @@ export class PersonController {
 		return result.value;
 	}
 }
+
