@@ -6,6 +6,7 @@ import { UserMongoRepository } from "src/devices/user-mongodb-repository";
 import { GetUserByIdUseCase } from "./get-user-by-id-use-case";
 import { UserRepository } from "../ports/user-repository";
 import { UserRepositoryModule } from "src/devices/user-repository.module";
+import { BcryptAdapter } from "src/devices/adapters/bcrypt";
 
 @Module({
   imports: [UserRepositoryModule],
@@ -13,10 +14,10 @@ import { UserRepositoryModule } from "src/devices/user-repository.module";
   providers: [
     {
       provide: 'REGISTER_USER_USECASE',
-      useFactory: (userRepository: UserRepository, userMapper: UserMapper) => {
-        return new RegisterUserUseCase(userRepository, userMapper);
+      useFactory: (userRepository: UserRepository, userMapper: UserMapper, hash: BcryptAdapter) => {
+        return new RegisterUserUseCase(userRepository, userMapper, hash);
       },
-      inject: [UserMongoRepository, UserMapper]
+      inject: [UserMongoRepository, UserMapper, BcryptAdapter]
     },
     {
       provide: 'GET_USER_BY_ID_USECASE',
@@ -25,7 +26,8 @@ import { UserRepositoryModule } from "src/devices/user-repository.module";
       },
       inject: [UserMongoRepository]
     },
-    UserMapper
+    UserMapper,
+    BcryptAdapter
   ]
 })
 export class UserModule { }

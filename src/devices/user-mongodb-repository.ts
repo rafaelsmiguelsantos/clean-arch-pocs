@@ -4,6 +4,7 @@ import { User } from 'src/entities/User';
 import { userToDTO, dtoToUser } from 'src/interface/mappers/user-converter';
 import { UserRepository } from 'src/use-cases/ports/user-repository';
 import { UserData } from 'src/interface/dto/user-data';
+import { UserResponseDTO } from 'src/use-cases/dto/user-dto';
 
 @Injectable()
 export class UserMongoRepository implements UserRepository {
@@ -16,8 +17,9 @@ export class UserMongoRepository implements UserRepository {
 		this.client = client;
 	}
 
-	async insert(user: User): Promise<User> {
+	async insertWithHashedPassword(user: User, hashedPassword: string): Promise<User> {
 		const userData = userToDTO(user);
+		userData.password = hashedPassword; // Use the hashed password instead
 		const result = await this.collection.insertOne(userData);
 		if (!result.acknowledged) {
 			throw new Error('Failed to insert user.');
@@ -31,9 +33,20 @@ export class UserMongoRepository implements UserRepository {
 		return userData ? dtoToUser(userData) : null;
 	}
 
-	async findById(id: string): Promise<User | null> {
-		const userData = await this.collection.findOne({ _id: new ObjectId(id) });
-		console.log(userData);
-		return userData ? dtoToUser(userData) : null;
+	async findById(id: string): Promise<UserResponseDTO | null> {
+    const userData = await this.collection.findOne({ _id: new ObjectId(id) });
+    console.log(userData);
+    return userData ? this.userDataToUserResponseDTO(userData) : null;
+}
+
+	private userDataToUserResponseDTO(userData: UserData): UserResponseDTO {
+		return {
+			id: typeof userData._id === 'string' ? userData._id : userData._id.toHexString(),
+			firstName: userData.firstName,
+			lastName: userData.lastName,
+			middleName: userData.middleName,
+			email: userData.email
+		};
 	}
+	
 }

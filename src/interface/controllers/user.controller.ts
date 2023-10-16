@@ -1,4 +1,4 @@
-import { Body, Controller, Post, HttpCode, Inject, Get, Param } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, Inject, Get, Param, BadRequestException } from '@nestjs/common';
 import { UseCase } from 'src/use-cases/ports/use-case';
 import { ErrorHandler } from 'src/shared/error-handler';
 import { UserRequestDTO, UserResponseDTO } from 'src/use-cases/dto/user-dto';
@@ -8,7 +8,7 @@ import { User } from 'src/entities/User';
 export class UserController {
 	constructor(
 		@Inject('REGISTER_USER_USECASE') private readonly registerUser: UseCase<UserRequestDTO, User>,
-		@Inject('GET_USER_BY_ID_USECASE') private readonly getUserById: UseCase<string, User>
+		@Inject('GET_USER_BY_ID_USECASE') private readonly getUserById: UseCase<string, UserResponseDTO>
 	) { }
 
 	@Post('register')
@@ -26,7 +26,7 @@ export class UserController {
 	async getById(@Param('id') id: string): Promise<UserResponseDTO> {
 		try {
 			const result = await this.getUserById.execute(id);
-			return this.userToResponseDTO(result);
+			return result;
 		} catch (error) {
 			ErrorHandler.handle(error);
 		}

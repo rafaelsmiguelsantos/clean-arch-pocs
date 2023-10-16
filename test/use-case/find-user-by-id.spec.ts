@@ -4,6 +4,8 @@ import { GetUserByIdUseCase } from "src/use-cases/user/get-user-by-id-use-case";
 import { EmailAddress } from "src/entities/EmailAddress";
 import { FullName } from "src/entities/FullName";
 import { User } from "src/entities/User";
+import { Password } from "src/entities/Password";
+import { UserResponseDTO } from "src/use-cases/dto/user-dto";
 
 describe('GetUserByIdUseCase', () => {
   let sut: GetUserByIdUseCase;
@@ -19,8 +21,12 @@ describe('GetUserByIdUseCase', () => {
 
   it('deve retornar um usuário quando encontrado pelo ID', async () => {
     const userId = '652b6b4983aaf912c340a371';
-    
-    const expectedUser = new User(new FullName('Jane', 'Doe'), new EmailAddress('jane.doe@example.com'));
+    const expectedUser: UserResponseDTO = {
+      id: userId,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john.doe@example.com'
+    };
     userRepositoryStub.findById = async (id: string) => expectedUser;
 
     const result = await sut.execute(userId);

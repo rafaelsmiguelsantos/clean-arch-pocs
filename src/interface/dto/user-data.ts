@@ -5,5 +5,6 @@ export class UserData {
   lastName: string;
   middleName?: string;
   email: string;
+  password: string;  // Adding the hashed password field (optional).
   _id?: string | ObjectId; 
 }

@@ -3,21 +3,22 @@ import { UseCase } from 'src/use-cases/ports/use-case';
 import { User } from 'src/entities/User';
 import { FullName } from 'src/entities/FullName';
 import { EmailAddress } from 'src/entities/EmailAddress';
+import { Password } from 'src/entities/Password'; // Importando a entidade Password
 import { ExistingUserError, UserNotFound } from 'src/entities/RegisterError';
 import { UserController } from 'src/interface/controllers/user.controller';
-import { UserRequestDTO } from 'src/use-cases/dto/user-dto';
+import { UserRequestDTO, UserResponseDTO } from 'src/use-cases/dto/user-dto';
 import { BadRequestException } from '@nestjs/common';
 
 describe('UserController', () => {
   let controller: UserController;
   let registerUserMock: jest.Mocked<UseCase<UserRequestDTO, User>>;
-  let getUserByIdMock: jest.Mocked<UseCase<string, User>>;
+  let getUserByIdMock: jest.Mocked<UseCase<string, UserResponseDTO>>;
 
   beforeEach(async () => {
     const executeMock = jest.fn();
 
     registerUserMock = { execute: executeMock } as jest.Mocked<UseCase<UserRequestDTO, User>>;
-    getUserByIdMock = { execute: executeMock } as jest.Mocked<UseCase<string, User>>;
+    getUserByIdMock = { execute: executeMock } as jest.Mocked<UseCase<string, UserResponseDTO>>;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
@@ -36,14 +37,21 @@ describe('UserController', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john.doe@example.com',
+      password: 'securePassword123!',
+      confirmPassword: 'securePassword123!'
     };
     const user = new User(
       new FullName(userDto.firstName, userDto.lastName),
-      new EmailAddress(userDto.email)
+      new EmailAddress(userDto.email),
+      new Password(userDto.password) // Adicionando a entidade Password
     );
     registerUserMock.execute.mockResolvedValueOnce(user);
     const result = await controller.register(userDto);
-    expect(result).toMatchObject(userDto);
+    expect(result).toMatchObject({
+      firstName: userDto.firstName,
+      lastName: userDto.lastName,
+      email: userDto.email
+    });
   });
 
   // Test for handling duplicate email during registration
@@ -51,7 +59,9 @@ describe('UserController', () => {
     const dto: UserRequestDTO = {
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john.doe@example.com'
+      email: 'john.doe@example.com',
+      password: 'securePassword123',
+      confirmPassword: 'securePassword123'
     };
     registerUserMock.execute.mockRejectedValueOnce(new ExistingUserError());
     await expect(controller.register(dto)).rejects.toThrow(BadRequestException);
@@ -60,17 +70,15 @@ describe('UserController', () => {
   // Test for successfully getting a user by ID
   it('should get a user by ID successfully', async () => {
     const userId = 'someUserId';
-    const user = new User(
-      new FullName('John', 'Doe'),
-      new EmailAddress('john.doe@example.com')
-    );
-    getUserByIdMock.execute.mockResolvedValueOnce(user);
-    const result = await controller.getById(userId);
-    expect(result).toMatchObject({
+    const userResponse: UserResponseDTO = {
+      id: userId,
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john.doe@example.com',
-    });
+      email: 'john.doe@example.com'
+    };
+    getUserByIdMock.execute.mockResolvedValueOnce(userResponse);
+    const result = await controller.getById(userId);
+    expect(result).toMatchObject(userResponse);
   });
 
   // Test for error scenario when a user by ID is not found

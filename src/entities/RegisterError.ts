@@ -33,3 +33,10 @@ export class InvalidIdError extends Error {
 		this.name = 'InvalidIdError';
 	}
 }
+
+export class PasswordMismatchError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'PasswordMismatchError';
+	}
+}
