@@ -11,8 +11,15 @@ describe('RegisterUserUseCase', () => {
   let sut: RegisterUserUseCase;
   let userRepositoryStub: Partial<UserRepository>;
   let userMapperStub: Partial<IMapper<UserRequestDTO, User>>;
+  let defaultDTO: UserRequestDTO;
 
   beforeEach(async () => {
+    defaultDTO = {
+      firstName: 'John',
+      lastName: 'David',
+      email: 'john.d.doe@example.com'
+    };
+
     userRepositoryStub = {
       insert: async (user: User) => user,
       findByEmail: async (email: string) => null
@@ -29,35 +36,33 @@ describe('RegisterUserUseCase', () => {
     sut = new RegisterUserUseCase(userRepositoryStub as UserRepository, userMapperStub as IMapper<UserRequestDTO, User>);
   });
 
-  it('deve registrar um novo usuário com sucesso', async () => {
-    const dto: UserRequestDTO = {
-      firstName: 'John',
-      lastName: 'David',
-      email: 'john.d.doe@example.com'
-    };
-    
-    const result = await sut.execute(dto);
-    
-    const fullName = new FullName('John', 'David');
-    const emailAddress = new EmailAddress('john.d.doe@example.com');
-    const expectedUser = new User(fullName, emailAddress);
+  const createUserFromDTO = (dto: UserRequestDTO) => {
+    return new User(new FullName(dto.firstName, dto.lastName), new EmailAddress(dto.email));
+  };
 
-    expect(result).toEqual(expectedUser);
+  describe('Successful registration', () => {
+    it('should register a new user successfully', async () => {
+      const result = await sut.execute(defaultDTO);
+      expect(result).toEqual(createUserFromDTO(defaultDTO));
+    });
   });
 
-  it('não deve registrar um usuário com um email já existente', async () => {
-    const dto: UserRequestDTO = {
-      firstName: 'John',
-      lastName: 'David',
-      email: 'john.d.doe@example.com'
-    };
-    
-    userRepositoryStub.findByEmail = async (email: string) => {
-      const existingFullName = new FullName('Jane', 'David', 'Smith');
-      const existingEmail = new EmailAddress('john.d.doe@example.com');
-      return new User(existingFullName, existingEmail);
-    };
+  describe('Failure scenarios', () => {
+    it('should not register a user with an already existing email', async () => {
+      userRepositoryStub.findByEmail = async () => createUserFromDTO(defaultDTO);
+      await expect(sut.execute(defaultDTO)).rejects.toThrow(ExistingUserError);
+    });
 
-    await expect(sut.execute(dto)).rejects.toThrow(ExistingUserError);
+    it('should throw an error when DTO mapping fails', async () => {
+      userMapperStub.toDomain = () => ({ failure: new Error("Failed to map DTO to domain") });
+      await expect(sut.execute(defaultDTO)).rejects.toThrowError("Failed to map DTO to domain");
+    });
+
+    it('should throw an error when unable to register the user', async () => {
+      userRepositoryStub.findByEmail = jest.fn().mockResolvedValue(null);
+      userMapperStub.toDomain = jest.fn().mockReturnValue({ success: createUserFromDTO(defaultDTO) });
+      userRepositoryStub.insert = jest.fn().mockResolvedValue(null);
+      await expect(sut.execute(defaultDTO)).rejects.toThrowError("Failed to register the user.");
+    });
   });
 });
