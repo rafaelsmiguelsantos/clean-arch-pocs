@@ -1,5 +1,5 @@
 import { BadRequestException } from "@nestjs/common";
-import { ExistingUserError, InvalidPhoneFormatException, UserNotFound, ValidationError } from "src/entities/RegisterError";
+import { ExistingUserError, InvalidPhoneFormatException, ValidationError } from "src/entities/RegisterError";
 
 export class ErrorHandler {
 
