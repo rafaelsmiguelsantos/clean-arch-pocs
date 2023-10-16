@@ -14,12 +14,10 @@ export class RegisterUserUseCase implements UseCase<UserRequestDTO, User> {
 	async execute(userDTO: UserRequestDTO): Promise<User> {
 		const result = this.mapper.toDomain(userDTO);
 
-		// Verifique primeiro se há um erro
 		if (result.failure) {
 			throw result.failure;
 		}
 
-		// Se não houver erro, proceda com o processo de registro
 		const userEntity = result.success;
 
 		const existingUser = await this.userRepository.findByEmail(userEntity.getEmail().getValue());
