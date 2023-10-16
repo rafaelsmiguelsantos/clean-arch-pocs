@@ -1,29 +1,31 @@
 import { Module } from "@nestjs/common";
-import { PERSON_MAPPER_TOKEN, RegisterUserUseCase } from "./register-use-case";
+import { RegisterUserUseCase } from "./register-use-case";
 import { UserMapper } from "src/interface/mappers/user-mapper";
 import { UserController } from "src/interface/controllers/person.controller";
 import { UserMongoRepository } from "src/devices/user-mongodb-repository";
+import { GetUserByIdUseCase } from "./get-user-by-id-use-case";
+import { UserRepository } from "../ports/user-repository";
+import { UserRepositoryModule } from "src/devices/user-repository.module";
 
 @Module({
+  imports: [UserRepositoryModule],
   controllers: [UserController],
   providers: [
-    UserMapper,
-    {
-      provide: 'UserRepositoryToken',
-      useClass: UserMongoRepository, // Sua implementação concreta
-    },
-    {
-      provide: PERSON_MAPPER_TOKEN,
-      useClass: UserMapper
-    },
     {
       provide: 'REGISTER_USER_USECASE',
-      useFactory: (userRepository: UserMongoRepository, mapper: UserMapper) => {
-        return new RegisterUserUseCase(userRepository, mapper);
+      useFactory: (userRepository: UserRepository, userMapper: UserMapper) => {
+        return new RegisterUserUseCase(userRepository, userMapper);
       },
-      inject: ['UserRepositoryToken', PERSON_MAPPER_TOKEN],
+      inject: [UserMongoRepository, UserMapper]
     },
+    {
+      provide: 'GET_USER_BY_ID_USECASE',
+      useFactory: (userRepository: UserRepository) => {
+        return new GetUserByIdUseCase(userRepository);
+      },
+      inject: [UserMongoRepository]
+    },
+    UserMapper
   ]
 })
 export class UserModule { }
-

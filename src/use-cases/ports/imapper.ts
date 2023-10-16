@@ -1,6 +1,4 @@
-import { Either } from "src/shared/either";
-
 export interface IMapper<I, O> {
-    toDomain(input: I):  Either<Error, O>;
+    toDomain(input: I):  { success?: O, failure?: Error };
     // Se necessário, você pode adicionar mais métodos, como 'toDTO' etc.
-}
+  }

@@ -12,9 +12,24 @@ export class ExistingUserError extends Error {
     }
 }
 
+export class UserNotFound extends Error {
+    constructor(message: string = "User not found") {
+        super(message);
+        this.name = this.constructor.name;
+        Object.setPrototypeOf(this, UserNotFound.prototype);
+    }
+}
+
 export class ValidationError extends Error {
     constructor(message: string) {
         super(message);
         this.name = "ValidationError";
     }
+}
+
+export class InvalidIdError extends Error {
+	constructor(message: string = 'Invalid ID provided.') {
+		super(message);
+		this.name = 'InvalidIdError';
+	}
 }

@@ -4,7 +4,10 @@ import { UserMongoRepository } from './user-mongodb-repository';
 
 @Module({
   imports: [MongodbModule],
-  providers: [UserMongoRepository],
-  exports: [UserMongoRepository],
+  providers: [{
+    provide: UserMongoRepository,
+    useClass: UserMongoRepository
+  }],
+  exports: [UserMongoRepository], 
 })
 export class UserRepositoryModule {}

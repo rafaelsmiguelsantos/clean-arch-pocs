@@ -3,6 +3,7 @@ export interface UserResponse {
 }
 
 export class UserResponseDTO {
+	id: string;
 	firstName: string;
 	lastName: string;
 	middleName?: string;
