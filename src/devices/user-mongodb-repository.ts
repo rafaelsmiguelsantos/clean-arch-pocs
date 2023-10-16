@@ -1,10 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MongoClient, Collection, ObjectId } from 'mongodb';
-import { User } from 'src/entities/User';
-import { userToDTO, dtoToUser } from 'src/interface/mappers/user-converter';
+import { userToDTO } from 'src/interface/mappers/user-converter';
 import { UserRepository } from 'src/use-cases/ports/user-repository';
-import { UserData } from 'src/interface/dto/user-data';
-import { UserResponseDTO } from 'src/use-cases/dto/user-dto';
+import { UserData } from 'src/devices/dto/user-data';
+import { UserRequestDTO, UserResponseDTO } from 'src/use-cases/dto/user-dto';
 
 @Injectable()
 export class UserMongoRepository implements UserRepository {
@@ -16,28 +15,38 @@ export class UserMongoRepository implements UserRepository {
 	constructor(@Inject('MONGO_CLIENT') client: MongoClient) {
 		this.client = client;
 	}
+	
+	async insertWithHashedPassword(user: UserRequestDTO, hashedPassword: string): Promise<UserResponseDTO> {
+		const userData = userToDTO(user, hashedPassword);
 
-	async insertWithHashedPassword(user: User, hashedPassword: string): Promise<User> {
-		const userData = userToDTO(user);
-		userData.password = hashedPassword; // Use the hashed password instead
-		const result = await this.collection.insertOne(userData);
-		if (!result.acknowledged) {
-			throw new Error('Failed to insert user.');
-		}
-		userData._id = result.insertedId;
-		return dtoToUser(userData);
+    const result = await this.collection.insertOne(userData);
+    if (!result.acknowledged) {
+        throw new Error('Failed to insert user.');
+    }
+
+    // Verificar se result.insertedId é um ObjectId e converter para string
+    const idString: string = (result.insertedId instanceof ObjectId) ? result.insertedId.toHexString() : String(result.insertedId);
+
+    return {
+        id: idString,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        middleName: user.middleName,
+        email: user.email,
+				phone: user.phone
+    };
 	}
 
-	async findByEmail(email: string): Promise<User | null> {
+	async findByEmail(email: string): Promise<UserResponseDTO | null> {
 		const userData = await this.collection.findOne({ email });
-		return userData ? dtoToUser(userData) : null;
+		return userData ? this.userDataToUserResponseDTO(userData) : null;
 	}
 
 	async findById(id: string): Promise<UserResponseDTO | null> {
-    const userData = await this.collection.findOne({ _id: new ObjectId(id) });
-    console.log(userData);
-    return userData ? this.userDataToUserResponseDTO(userData) : null;
-}
+		const userData = await this.collection.findOne({ _id: new ObjectId(id) });
+		console.log(userData);
+		return userData ? this.userDataToUserResponseDTO(userData) : null;
+	}
 
 	private userDataToUserResponseDTO(userData: UserData): UserResponseDTO {
 		return {
@@ -45,8 +54,15 @@ export class UserMongoRepository implements UserRepository {
 			firstName: userData.firstName,
 			lastName: userData.lastName,
 			middleName: userData.middleName,
-			email: userData.email
+			email: userData.email,
+			password: userData.password,
+			phone: userData.phones.map(phone => ({
+				cellPhone: phone.cellPhone,
+				homePhone: phone.homePhone,
+				corporatePhone: phone.corporatePhone
+			}))
 		};
 	}
 	
+
 }

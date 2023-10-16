@@ -6,7 +6,7 @@ import { UserMongoRepository } from "src/devices/user-mongodb-repository";
 import { GetUserByIdUseCase } from "./get-user-by-id-use-case";
 import { UserRepository } from "../ports/user-repository";
 import { UserRepositoryModule } from "src/devices/user-repository.module";
-import { BcryptAdapter } from "src/devices/adapters/bcrypt";
+import { BcryptAdapter } from "src/devices/adapters/bcrypt.service";
 
 @Module({
   imports: [UserRepositoryModule],

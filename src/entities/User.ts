@@ -1,6 +1,7 @@
 import { EmailAddress } from "./EmailAddress";
 import { FullName } from "./FullName";
 import { Password } from "./Password";
+import { PhoneNumber } from "./PhoneNumber";
 import { ValidationError } from "./RegisterError";
 
 export class User {
@@ -8,15 +9,17 @@ export class User {
   private name: FullName;
   private email: EmailAddress;
   private password: Password;
+  private phones: PhoneNumber[];  // Lista de telefones
 
   constructor(
     name: FullName,
     email: EmailAddress,
     password: Password,
+    phones: PhoneNumber[],  // Lista de telefones como parâmetro
     id?: string
   ) {
     // Basic validations (we assume the value objects handle their internal validations)
-    if (!name || !email) {
+    if (!name || !email || !password || !phones || phones.length === 0) {
       throw new ValidationError('Some required fields are missing.');
     }
 
@@ -24,6 +27,7 @@ export class User {
     this.email = email;
     this.id = id;
     this.password = password;
+    this.phones = phones;
   }
 
   // Getter methods
@@ -48,7 +52,7 @@ export class User {
     return this.password;
   }
 
-  setPassword(password: Password): void {
-    this.password = password;
+  getPhones(): PhoneNumber[] {
+    return this.phones;
   }
 }

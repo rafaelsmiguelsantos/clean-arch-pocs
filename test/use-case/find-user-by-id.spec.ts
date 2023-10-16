@@ -1,10 +1,6 @@
 import { UserNotFound } from "src/entities/RegisterError";
 import { UserRepository } from "src/use-cases/ports/user-repository";
 import { GetUserByIdUseCase } from "src/use-cases/user/get-user-by-id-use-case";
-import { EmailAddress } from "src/entities/EmailAddress";
-import { FullName } from "src/entities/FullName";
-import { User } from "src/entities/User";
-import { Password } from "src/entities/Password";
 import { UserResponseDTO } from "src/use-cases/dto/user-dto";
 
 describe('GetUserByIdUseCase', () => {
@@ -25,7 +21,14 @@ describe('GetUserByIdUseCase', () => {
       id: userId,
       firstName: 'John',
       lastName: 'Doe',
-      email: 'john.doe@example.com'
+      email: 'john.doe@example.com',
+      phone: [
+        {
+          cellPhone: '123456789',
+          homePhone: '123456789',
+          corporatePhone: '123456789'
+        }
+      ]
     };
     userRepositoryStub.findById = async (id: string) => expectedUser;
 

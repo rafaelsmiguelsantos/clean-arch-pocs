@@ -4,6 +4,7 @@ import { IMapper } from "src/use-cases/ports/imapper";
 import { User } from "src/entities/User";
 import { UserRequestDTO } from "src/use-cases/dto/user-dto";
 import { Password } from "src/entities/Password";
+import { PhoneNumber } from "src/entities/PhoneNumber";
 
 export class UserMapper implements IMapper<UserRequestDTO, User> {
   toDomain(personDTO: UserRequestDTO) {
@@ -12,10 +13,16 @@ export class UserMapper implements IMapper<UserRequestDTO, User> {
       const email = new EmailAddress(personDTO.email);
       const password = new Password(personDTO.password);
 
+      // Convertendo os phones do DTO para uma lista de PhoneNumber
+      const phones = personDTO.phone.map(phoneDTO => {
+        return new PhoneNumber(phoneDTO.corporatePhone, phoneDTO.cellPhone, phoneDTO.homePhone);
+      });
+
       const person = new User(
         fullName,
         email,
         password,
+        phones  // Passando a lista de PhoneNumber
       );
 
       return { success: person };
@@ -24,4 +31,3 @@ export class UserMapper implements IMapper<UserRequestDTO, User> {
     }
   }
 }
-
