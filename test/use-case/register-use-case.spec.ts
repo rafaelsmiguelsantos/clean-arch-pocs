@@ -4,7 +4,7 @@ import { ExistingUserError } from "src/entities/RegisterError";
 import { User } from "src/entities/User";
 import { UserRepository } from "src/use-cases/ports/user-repository";
 import { UserRequestDTO } from "src/use-cases/dto/user-dto";
-import { RegisterUserUseCase } from "src/use-cases/person/register-use-case";
+import { RegisterUserUseCase } from "src/use-cases/user/register-use-case";
 import { IMapper } from "src/use-cases/ports/imapper";
 
 describe('RegisterUserUseCase', () => {

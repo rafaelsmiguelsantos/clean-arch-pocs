@@ -1,6 +1,6 @@
 import { UserNotFound } from "src/entities/RegisterError";
 import { UserRepository } from "src/use-cases/ports/user-repository";
-import { GetUserByIdUseCase } from "src/use-cases/person/get-user-by-id-use-case";
+import { GetUserByIdUseCase } from "src/use-cases/user/get-user-by-id-use-case";
 import { EmailAddress } from "src/entities/EmailAddress";
 import { FullName } from "src/entities/FullName";
 import { User } from "src/entities/User";
