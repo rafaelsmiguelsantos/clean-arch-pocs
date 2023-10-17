@@ -1,6 +1,6 @@
 import { CompanyRequestDTO, CompanyResponseDTO } from "../dto/company-dto";
 
-interface ICompanyRepository {
+export default interface ICompanyRepository {
     findById(id: string): Promise<CompanyResponseDTO | null>;
     insert(company: CompanyRequestDTO): Promise<CompanyResponseDTO>;
     findByCNPJ(cnpj: string): Promise<CompanyResponseDTO | null>;
@@ -10,5 +10,3 @@ interface ICompanyRepository {
     // findAll(): Promise<Company[]>;
     // findByUserId(userId: string): Promise<Company[]>;
 }
-
-export default ICompanyRepository;

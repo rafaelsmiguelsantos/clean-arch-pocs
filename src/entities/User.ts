@@ -3,22 +3,29 @@ import { FullName } from "./FullName";
 import { Password } from "./Password";
 import { PhoneNumber } from "./PhoneNumber";
 import { ValidationError } from "./RegisterError";
+import { Roles } from "./roles"; // 1. Importando o enum Roles
 
 export class User {
-  private id?: string; // Usando string como tipo, por exemplo, para UUIDs ou ObjectIDs do MongoDB
+  private id?: string; 
   private name: FullName;
   private email: EmailAddress;
   private password: Password;
-  private phones: PhoneNumber[];  // Lista de telefones
-
+  private phones: PhoneNumber[]; 
+  private role: Roles; // 2. Adicionando o campo role
+  
   constructor(
     name: FullName,
     email: EmailAddress,
     password: Password,
-    phones: PhoneNumber[],  // Lista de telefones como parâmetro
+    phones: PhoneNumber[],
+    role: Roles, // Adicionando role como um parâmetro
     id?: string
   ) {
-    // Basic validations (we assume the value objects handle their internal validations)
+    // 3. Validação do role
+    if (!Object.values(Roles).includes(role)) {
+      throw new ValidationError('Invalid role provided.');
+    }
+
     if (!name || !email || !password || !phones || phones.length === 0) {
       throw new ValidationError('Some required fields are missing.');
     }
@@ -28,6 +35,7 @@ export class User {
     this.id = id;
     this.password = password;
     this.phones = phones;
+    this.role = role; // Definindo o valor de role
   }
 
   // Getter methods
@@ -39,7 +47,6 @@ export class User {
     return this.email;
   }
 
-  // Getter methods
   getId(): string | undefined {
     return this.id;
   }
@@ -54,5 +61,10 @@ export class User {
 
   getPhones(): PhoneNumber[] {
     return this.phones;
+  }
+
+  // Getter para role
+  getRole(): Roles {
+    return this.role;
   }
 }

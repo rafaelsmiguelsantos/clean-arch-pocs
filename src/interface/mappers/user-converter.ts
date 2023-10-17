@@ -1,13 +1,18 @@
+import { User } from "src/entities/User";
 import { UserData } from "../../devices/dto/user-data";
-import { UserRequestDTO } from "src/use-cases/dto/user-dto";
 
-export function userToDTO(user: UserRequestDTO, hashedPassword): UserData {
+export function userToDTO(user: User, hashedPassword): UserData {
 	return {
-		firstName: user.firstName,
-		lastName: user.lastName,
-		middleName: user.middleName,
-		email: user.email,
+		firstName: user.getName().firstName,
+		lastName: user.getName().lastName,
+		middleName: user.getName().middleName,
+		email: user.getEmail().getValue(),
     password: hashedPassword,
-		phones: user.phone
+		phones: user.getPhones().map(phone => ({
+			cellPhone: phone.cellPhone,
+			homePhone: phone.homePhone,
+			corporatePhone: phone.corporatePhone
+		})),
+		roles: user.getRole()
 	};
 }

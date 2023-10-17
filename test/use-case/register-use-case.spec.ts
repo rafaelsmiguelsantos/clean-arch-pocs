@@ -10,6 +10,7 @@ import { IMapper } from "src/use-cases/ports/imapper";
 import { IHasher } from "src/use-cases/ports/hasher";
 import { PhoneNumber } from "src/entities/PhoneNumber";
 import { createUserRepositoryStub, createUserMapperStub, createHasherStub } from "test/stubs/user-stub.factories";
+import { Roles } from "src/entities/roles";
 
 describe('RegisterUserUseCase', () => {
   let sut: RegisterUserUseCase;
@@ -48,7 +49,8 @@ describe('RegisterUserUseCase', () => {
       lastName: dto.lastName,
       middleName: dto.middleName,
       email: dto.email,
-      phone: dto.phone
+      phone: dto.phone,
+      roles: Roles.ADMIN
     };
   };
 
@@ -81,11 +83,12 @@ describe('RegisterUserUseCase', () => {
           new FullName(defaultDTO.firstName, defaultDTO.lastName),
           new EmailAddress(defaultDTO.email),
           new Password(defaultDTO.password),
-          phones
+          phones,
+          Roles.ADMIN
         )
       });
 
-      userRepositoryStub.insertWithHashedPassword = jest.fn().mockResolvedValue(null);
+      userRepositoryStub.insert = jest.fn().mockResolvedValue(null);
 
       await expect(sut.execute(defaultDTO)).rejects.toThrowError("Failed to register the user.");
     });

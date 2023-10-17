@@ -3,7 +3,8 @@ import { MongoClient, Collection, ObjectId } from 'mongodb';
 import { userToDTO } from 'src/interface/mappers/user-converter';
 import { UserRepository } from 'src/use-cases/ports/user-repository';
 import { UserData } from 'src/devices/dto/user-data';
-import { UserRequestDTO, UserResponseDTO } from 'src/use-cases/dto/user-dto';
+import { UserResponseDTO } from 'src/use-cases/dto/user-dto';
+import { User } from 'src/entities/User';
 
 @Injectable()
 export class UserMongoRepository implements UserRepository {
@@ -16,7 +17,7 @@ export class UserMongoRepository implements UserRepository {
 		this.client = client;
 	}
 
-	async insertWithHashedPassword(user: UserRequestDTO, hashedPassword: string): Promise<UserResponseDTO> {
+	async insert(user: User, hashedPassword: string): Promise<UserResponseDTO> {
 		const userData = userToDTO(user, hashedPassword);
 
 		const result = await this.collection.insertOne(userData);
@@ -29,12 +30,17 @@ export class UserMongoRepository implements UserRepository {
 
 		return {
 			id: idString,
-			firstName: user.firstName,
-			lastName: user.lastName,
-			middleName: user.middleName,
-			email: user.email,
-			phone: user.phone
-		};
+			firstName: user.getName().firstName,    // Use getters aqui
+			lastName: user.getName().lastName,
+			middleName: user.getName().middleName,
+			email: user.getEmail().getValue(),
+			phone: user.getPhones().map(phone => ({
+					cellPhone: phone.cellPhone,
+					homePhone: phone.homePhone,
+					corporatePhone: phone.corporatePhone
+			})),
+			roles: user.getRole()  // Adicione a role aqui
+	};
 	}
 
 	async findByEmail(email: string): Promise<UserResponseDTO | null> {

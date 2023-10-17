@@ -21,11 +21,10 @@ export class CreateCompanyUseCase implements UseCase<CompanyRequestDTO, CompanyR
 		}
 
 		const existingCompany = await this.companyRepository.findByCNPJ(companyDTO.cnpj);
-if (existingCompany) {
-    throw new ValidationError("A company with this CNPJ already exists.");
-}
+		if (existingCompany) {
+			throw new ValidationError("A company with this CNPJ already exists.");
+		}
 
-		// 2. Valide os dados da empresa e do endereço.
 		const companyOrError = this.mapper.toDomain(companyDTO);
 		if (companyOrError.failure) {
 			throw companyOrError.failure;
@@ -35,23 +34,21 @@ if (existingCompany) {
 
 		const convertCompanyRequestDTO = this.toDTO(companyEntity)
 
-		// 3. Se os dados forem válidos, crie a empresa e associe-a ao usuário.
 		const createdCompany = await this.companyRepository.insert(convertCompanyRequestDTO);
 
 		if (!createdCompany || !createdCompany.id) {
 			throw new Error("Failed to create the company.");
 		}
 
-		// 4. Retorne a empresa criada como resposta.
 		return createdCompany;
 	}
 
 	toDTO(company: Company): CompanyRequestDTO {
 		return {
 			id: company.id,
-			name: company.name,  // Aqui supomos que o FullName tem uma representação em string que pode ser diretamente atribuída.
+			name: company.name,
 			fictitiousName: company.fictitiousName,
-			phone: company.phone.corporatePhone,  // Aqui supomos que PhoneNumber tem uma representação em string.
+			phone: company.phone.corporatePhone,
 			address: {
 				city: company.address.city,
 				state: company.address.state,

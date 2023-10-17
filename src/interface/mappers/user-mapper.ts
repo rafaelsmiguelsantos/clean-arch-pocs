@@ -5,6 +5,7 @@ import { User } from "src/entities/User";
 import { UserRequestDTO } from "src/use-cases/dto/user-dto";
 import { Password } from "src/entities/Password";
 import { PhoneNumber } from "src/entities/PhoneNumber";
+import { Roles } from "src/entities/roles";
 
 export class UserMapper implements IMapper<UserRequestDTO, User> {
   toDomain(personDTO: UserRequestDTO) {
@@ -22,7 +23,8 @@ export class UserMapper implements IMapper<UserRequestDTO, User> {
         fullName,
         email,
         password,
-        phones  // Passando a lista de PhoneNumber
+        phones,
+        Roles.ADMIN
       );
 
       return { success: person };

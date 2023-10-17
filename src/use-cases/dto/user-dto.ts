@@ -1,3 +1,5 @@
+import { Roles } from "src/entities/roles";
+
 export interface UserResponse {
 	id: string;
 }
@@ -10,6 +12,7 @@ export class UserResponseDTO {
 	email: string;
 	password?: string;
 	phone: Phones[];
+	roles?: Roles;
 }
 
 export class UserRequestDTO {

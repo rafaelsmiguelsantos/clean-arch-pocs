@@ -32,30 +32,13 @@ export class RegisterUserUseCase implements UseCase<UserRequestDTO, UserResponse
 		}
 		const hashedPassword = await this.hasher.hash(userEntity.getPassword().getValue());
 
-		const convertDTO = this.toUserRequestDTO(userEntity);
-
-		const registeredUser = await this.userRepository.insertWithHashedPassword(convertDTO, hashedPassword);
+		const registeredUser = await this.userRepository.insert(userEntity, hashedPassword);
 
 		if (!registeredUser || !registeredUser.id) {
 			throw new Error("Failed to register the user.");
 		}
 
 		return registeredUser;
-	}
-
-	private toUserRequestDTO(user: User): UserRequestDTO {
-		return {
-			id: user?.getId(),
-			firstName: user.getName().firstName,
-			lastName: user.getName().lastName,
-			middleName: user.getName().middleName,
-			email: user.getEmail().getValue(),
-			phone: user.getPhones().map(phone => ({   // Mapear cada PhoneNumber para o formato desejado
-				cellPhone: phone.cellPhone,
-				homePhone: phone.homePhone,
-				corporatePhone: phone.corporatePhone
-			}))
-		};
 	}
 
 }
