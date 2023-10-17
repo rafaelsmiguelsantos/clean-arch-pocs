@@ -5,7 +5,7 @@ import { IAuthService } from "../ports/auth-service.interface";
 import { LoginUseCase } from "./login-use-case";
 import { AuthService } from "src/devices/adapters/auth.service";
 import { JWTTokenService } from "src/devices/adapters/jwt.service";
-import { UserMongoRepository } from "src/devices/user-mongodb-repository";
+import { UserMongoRepository } from "src/devices/db/user-mongodb-repository";
 
 
 @Module({

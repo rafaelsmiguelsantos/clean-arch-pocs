@@ -2,7 +2,7 @@ import { Module } from "@nestjs/common";
 import { RegisterUserUseCase } from "./register-use-case";
 import { UserMapper } from "src/interface/mappers/user-mapper";
 import { UserController } from "src/interface/controllers/user.controller";
-import { UserMongoRepository } from "src/devices/user-mongodb-repository";
+import { UserMongoRepository } from "src/devices/db/user-mongodb-repository";
 import { GetUserByIdUseCase } from "./get-user-by-id-use-case";
 import { UserRepository } from "../ports/user-repository";
 import { UserRepositoryModule } from "src/devices/user-repository.module";

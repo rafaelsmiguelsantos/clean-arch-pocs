@@ -15,26 +15,26 @@ export class UserMongoRepository implements UserRepository {
 	constructor(@Inject('MONGO_CLIENT') client: MongoClient) {
 		this.client = client;
 	}
-	
+
 	async insertWithHashedPassword(user: UserRequestDTO, hashedPassword: string): Promise<UserResponseDTO> {
 		const userData = userToDTO(user, hashedPassword);
 
-    const result = await this.collection.insertOne(userData);
-    if (!result.acknowledged) {
-        throw new Error('Failed to insert user.');
-    }
+		const result = await this.collection.insertOne(userData);
+		if (!result.acknowledged) {
+			throw new Error('Failed to insert user.');
+		}
 
-    // Verificar se result.insertedId é um ObjectId e converter para string
-    const idString: string = (result.insertedId instanceof ObjectId) ? result.insertedId.toHexString() : String(result.insertedId);
+		// Verificar se result.insertedId é um ObjectId e converter para string
+		const idString: string = (result.insertedId instanceof ObjectId) ? result.insertedId.toHexString() : String(result.insertedId);
 
-    return {
-        id: idString,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        middleName: user.middleName,
-        email: user.email,
-				phone: user.phone
-    };
+		return {
+			id: idString,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			middleName: user.middleName,
+			email: user.email,
+			phone: user.phone
+		};
 	}
 
 	async findByEmail(email: string): Promise<UserResponseDTO | null> {
@@ -63,6 +63,4 @@ export class UserMongoRepository implements UserRepository {
 			}))
 		};
 	}
-	
-
 }

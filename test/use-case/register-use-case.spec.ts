@@ -9,13 +9,14 @@ import { RegisterUserUseCase } from "src/use-cases/user/register-use-case";
 import { IMapper } from "src/use-cases/ports/imapper";
 import { IHasher } from "src/use-cases/ports/hasher";
 import { PhoneNumber } from "src/entities/PhoneNumber";
+import { createUserRepositoryStub, createUserMapperStub, createHasherStub } from "test/stubs/user-stub.factories";
 
 describe('RegisterUserUseCase', () => {
   let sut: RegisterUserUseCase;
-  let userRepositoryStub: Partial<UserRepository>;
-  let userMapperStub: Partial<IMapper<UserRequestDTO, User>>;
   let defaultDTO: UserRequestDTO;
-  let hasherStub: Partial<IHasher>;
+  let userRepositoryStub;
+  let userMapperStub;
+  let hasherStub;
 
   beforeEach(async () => {
     defaultDTO = {
@@ -33,39 +34,9 @@ describe('RegisterUserUseCase', () => {
       ]
     };
 
-    userRepositoryStub = {
-      insertWithHashedPassword: async (user: UserRequestDTO, hashedPassword: string): Promise<UserResponseDTO> => {
-        return {
-          id: "mock-id", // você pode gerar um id mock aqui, como uma string estática ou usando algum gerador
-          firstName: user.firstName,
-          lastName: user.lastName,
-          middleName: user.middleName,
-          email: user.email,
-          phone: user.phone
-        };
-      },
-      findByEmail: async (email: string) => null
-    };
-
-
-
-    userMapperStub = {
-      toDomain: (dto: UserRequestDTO) => {
-        const fullName = new FullName(dto.firstName, dto.lastName, dto.middleName);
-        const email = new EmailAddress(dto.email);
-        const password = new Password(dto.password);
-        // Mapeando a lista de phones do DTO para uma lista de PhoneNumber
-        const phones = dto.phone.map(phoneDTO => {
-          return new PhoneNumber(phoneDTO.corporatePhone, phoneDTO.cellPhone, phoneDTO.homePhone);
-        });
-        return { success: new User(fullName, email, password, phones) };
-      }
-    };
-
-    hasherStub = {
-      hash: async (password: string) => password,
-      compare: async (password: string, hash: string) => password === hash
-    };
+    userRepositoryStub = createUserRepositoryStub();
+    userMapperStub = createUserMapperStub();
+    hasherStub = createHasherStub();
 
     sut = new RegisterUserUseCase(userRepositoryStub as UserRepository, userMapperStub as IMapper<UserRequestDTO, User>, hasherStub as IHasher);
   });
