@@ -8,8 +8,7 @@ export class CompanyMapper implements IMapper<CompanyRequestDTO, Company> {
   toDomain(companyDTO: CompanyRequestDTO) {
     try {
       const emailObj = new EmailAddress(companyDTO.emailCorporate);  
-      const phoneObj = new PhoneNumber(companyDTO.phone);  // Supondo que PhoneNumber tem um construtor que aceita uma string.
-
+      const phoneObj = new PhoneNumber(companyDTO.phone);
       const address = new Address(
         companyDTO.address.city, 
         companyDTO.address.state, 

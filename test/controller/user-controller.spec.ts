@@ -4,23 +4,27 @@ import { ExistingUserError, UserNotFound } from 'src/entities/RegisterError';
 import { UserController } from 'src/interface/controllers/user.controller';
 import { UserRequestDTO, UserResponseDTO } from 'src/use-cases/dto/user-dto';
 import { BadRequestException } from '@nestjs/common';
+import { EmployeeRequestDTO, EmployeeResponseDTO } from 'src/use-cases/dto/employee-dto';
 
 describe('UserController', () => {
   let controller: UserController;
   let registerUserMock: jest.Mocked<UseCase<UserRequestDTO, UserResponseDTO>>;
   let getUserByIdMock: jest.Mocked<UseCase<string, UserResponseDTO>>;
+  let registerEmployeeMock: jest.Mocked<UseCase<EmployeeRequestDTO, EmployeeResponseDTO>>;
 
   beforeEach(async () => {
     const executeMock = jest.fn();
 
     registerUserMock = { execute: executeMock } as jest.Mocked<UseCase<UserRequestDTO, UserResponseDTO>>;
     getUserByIdMock = { execute: executeMock } as jest.Mocked<UseCase<string, UserResponseDTO>>;
+    registerEmployeeMock = { execute: executeMock } as jest.Mocked<UseCase<EmployeeRequestDTO, EmployeeResponseDTO>>;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
         { provide: 'REGISTER_USER_USECASE', useValue: registerUserMock },
         { provide: 'GET_USER_BY_ID_USECASE', useValue: getUserByIdMock },
+        { provide: 'REGISTER_EMPLOYEE_USECASE', useValue: registerUserMock}
       ],
     }).compile();
 
@@ -104,5 +108,4 @@ describe('UserController', () => {
     getUserByIdMock.execute.mockRejectedValueOnce(new UserNotFound());
     await expect(controller.getById(userId)).rejects.toThrowError(BadRequestException);
   });
-
 });

@@ -21,7 +21,7 @@ export class UserRequestDTO {
 	lastName: string;
 	middleName?: string;
 	email: string;
-	password?: string;
+	password: string;
 	confirmPassword?: string;
 	phone: Phones[];
 }
