@@ -5,14 +5,15 @@ import { PhoneNumber } from "./PhoneNumber";
 import { ValidationError } from "./RegisterError";
 import { Roles } from "./roles"; // 1. Importando o enum Roles
 
-export class User {
+export class Employee {
   private id?: string; 
   private name: FullName;
   private email: EmailAddress;
   private password: Password;
   private phones: PhoneNumber[]; 
   private role: Roles; // 2. Adicionando o campo role
-  private companyId?: string;
+  private companyId: string;
+  private userId: string;
 
   constructor(
     name: FullName,
@@ -20,7 +21,8 @@ export class User {
     password: Password,
     phones: PhoneNumber[],
     role: Roles,
-    companyId?: string,
+    companyId: string,
+    userId: string,
     id?: string
   ) {
     // 3. Validação do role
@@ -28,7 +30,7 @@ export class User {
       throw new ValidationError('Invalid role provided.');
     }
 
-    if (!name || !email || !password || !phones || phones.length === 0) {
+    if (!name || !email || !password || !phones || phones.length === 0 || !companyId || !userId) {
       throw new ValidationError('Some required fields are missing.');
     }
 
@@ -37,8 +39,9 @@ export class User {
     this.id = id;
     this.password = password;
     this.phones = phones;
-    this.role = role; // Definindo o valor de role
+    this.role = role;
     this.companyId = companyId;
+    this.userId = userId;
   }
 
   // Getter methods
@@ -71,7 +74,11 @@ export class User {
     return this.role;
   }
 
-  getCompanyId(): string | undefined {
+  getCompanyId(): string {
     return this.companyId;
+  }
+
+  getUserId(): string {
+    return this.userId;
   }
 }
