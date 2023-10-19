@@ -8,8 +8,7 @@ import { EmployeeRequestDTO, EmployeeResponseDTO } from 'src/use-cases/dto/emplo
 export class UserController {
 	constructor(
 		@Inject('REGISTER_USER_USECASE') private readonly registerUser: UseCase<UserRequestDTO, UserResponseDTO>,
-		@Inject('GET_USER_BY_ID_USECASE') private readonly getUserById: UseCase<string, UserResponseDTO>,
-		@Inject('REGISTER_EMPLOYEE_USECASE') private readonly registerEmployee: UseCase<EmployeeRequestDTO, EmployeeResponseDTO>
+		@Inject('GET_USER_BY_ID_USECASE') private readonly getUserById: UseCase<string, UserResponseDTO>
 	) { }
 
 	@Post('register')
@@ -27,18 +26,6 @@ export class UserController {
 	async getById(@Param('id') id: string): Promise<UserResponseDTO> {
 		try {
 			const result = await this.getUserById.execute(id);
-			return result;
-		} catch (error) {
-			ErrorHandler.handle(error);
-		}
-	}
-
-	@Post('register-employee')
-	@HttpCode(201)
-	async registerNewEmployee(@Body() employee: EmployeeRequestDTO, @Req() req: any): Promise<EmployeeResponseDTO> {
-		try {
-			employee.userId = req.userId;
-			const result = await this.registerEmployee.execute(employee);
 			return result;
 		} catch (error) {
 			ErrorHandler.handle(error);
